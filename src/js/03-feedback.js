@@ -26,7 +26,6 @@ const loadFromLocalStorage = () => {
     messageTextArea.value = formData.message;
   }
 };
-
 loadFromLocalStorage();
 
 form.addEventListener('input', saveToLocalStorage);
