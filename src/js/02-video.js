@@ -2,8 +2,7 @@ import Player from '@vimeo/player';
 import throttle from 'lodash.throttle';
 
 const iframe = document.querySelector('#vimeo-player');
-// zainicjowanie biblioteki vimeo
-// zmienna player to video
+// stworzenie obiektu odtwarzacza vimeo
 const player = new Player(iframe);
 
 // zmienna savedtime to pobrane dane z localStorage, są to pliki posiadające pliki .JSON, więc zmienna posiada string
@@ -18,11 +17,14 @@ const savedTime = localStorage.getItem('videoplayer-current-time');
 */
 const initialTime = savedTime ? parseFloat(savedTime) : 0;
 
+// ta linia kodu służy do ustawienia czasu ze zmiennej initialTime za pomocą metody setCurrentTime
+player.setCurrentTime(initialTime);
+
+// funkcja strzałkowa która posiada jeden parametr time
 const saveCurrentTime = time => {
+  // w localStorage nadpisujemy wartość z kluczem videoplayer-current-time na wartość parametru time przekształconego w string
   localStorage.setItem('videoplayer-current-time', time.toString());
 };
-
-player.setCurrentTime(initialTime);
 
 // Dodaj nasłuchiwanie zdarzenia timeupdate z użyciem lodash.throttle
 player.on(
