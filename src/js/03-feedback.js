@@ -1,12 +1,10 @@
-import throttle from 'lodash.throttle';
-
-const form = document.querySelector('form');
+const form = document.querySelector('.feedback-form');
 const emailInput = document.querySelector('input');
 const messageTextArea = document.querySelector('textarea');
 
-// zmienna zawiera funkcję która ma się wywoływać co pół sekundy
-// ta funkcja to zapisywanie danych do localStorage
+// przesyłaj dane do localStorage nie częściej niż co 0.5 sekundy
 const saveToLocalStorage = throttle(() => {
+  // tablica danych
   const formData = {
     email: emailInput.value,
     message: messageTextArea.value,
@@ -15,13 +13,10 @@ const saveToLocalStorage = throttle(() => {
 }, 500);
 
 const loadFromLocalStorage = () => {
-  // wartość klucza feedback
   const formDataJSON = localStorage.getItem('feedback-form-state');
-  // ten if sprawdza czy owa wartość istnieje
+  // jeśli formDataJSON nie jest pustym stringiem
   if (formDataJSON) {
-    // jeśli tak to tworzy zmienną która prasuje wartość klucza feedback
     const formData = JSON.parse(formDataJSON);
-    // zmień wartości na sprasowane przed chwilą stringi
     emailInput.value = formData.email;
     messageTextArea.value = formData.message;
   }
