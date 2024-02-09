@@ -10,7 +10,7 @@
 
 import throttle from 'lodash.throttle';
 
-// dostęp do szystkich elementów HTML
+// dostęp do wszystkich elementów HTML
 const form = document.querySelector('.feedback-form');
 const emailInput = document.querySelector('input[name="email"]');
 const messageTextArea = document.querySelector('textarea[name="message"]');
