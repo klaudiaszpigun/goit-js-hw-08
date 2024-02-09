@@ -1,51 +1,64 @@
+/*
+1. Gdy użytkownik wpisuje dane do formularza, niech będą zapisywane one do local storage w kluczy "feedback-form-state".
+
+2. Gdy odświeżamy stronę interpretator ma wypełniać pola wartościami z local storage
+
+3. Po naciśnięciu przycisku wyczyść local storage i pola formularza i w konsoli wyloguj obiekt z polami email i message i ich wartościami.
+
+4. Local storage ma się aktualizować nie częściej niż raz na 0.5 sekundy.
+*/
+
 import throttle from 'lodash.throttle';
 
+// dostęp do szystkich elementów HTML
 const form = document.querySelector('.feedback-form');
 const emailInput = document.querySelector('input[name="email"]');
 const messageTextArea = document.querySelector('textarea[name="message"]');
 
-// wczytuje dane z local storage i wypełnia nimi pola formularza podczas ładowania strony.
-// funkcja strzałkowa pełniąca rolę callbacku
-const loadFromLocalStorage = () => {
-  // zmienna zawiera wartość obecnej wartości w localStorage
-  const formDataJSON = localStorage.getItem('feedback-form-state');
-  // jeśli wyżej zadeklarowana zmienna nie jest pustym stringiem
-  if (formDataJSON) {
-    // wtedy zmienna formData to będzie sprasowany obiekt
-    const formData = JSON.parse(formDataJSON);
-    // wartość obecna okna w formularzu to właściwość obiektu sprasowanego
-    emailInput.value = formData.email;
-    messageTextArea.value = formData.message;
-  }
-};
-// wywołujemy tą funkcję
-loadFromLocalStorage();
-
-// zapisuje dane formularza do local storage z opóźnieniem za pomocą throttle
-// funkcja strzałkowa, pełniąca rolę callbacku który wykonuje się nie częściej niż co 0.5 sekundy
+// deklaracja callbacku z throttlem, który zapisuje co 0.5 sekundy dane z pól do local storage
 const saveToLocalStorage = throttle(() => {
-  // zawiera obiekt w którym znajduje się dwie właściwości i każda z nich zawiera AKTUALNĄ wartość pola
   const formData = {
     email: emailInput.value,
     message: messageTextArea.value,
   };
-  // dodaje ten obiekt do localStorage
   localStorage.setItem('feedback-form-state', JSON.stringify(formData));
 }, 500);
 
-// wywołujemy funkcję zapisującą dane do localStorage gdy użytkownik coś wpisuje
+// przy evencie input zapisuje się co 0.5 sekundy dane z pól do formularza
 form.addEventListener('input', saveToLocalStorage);
 
-// gdy użytkowniek naciśnie przycisk i pola będą zapełnione, to usuwamy dane z localStorage, resetujemy formularz i wyrzucamy dane w konsoli
+// funkcja strzałkowa która ma za zadanie pobrać wartość z local storage i wkleić je do pól formularza
+const loadFromLocalStorage = () => {
+  // zmienna formDataJSON to wartość klucza z localStorage
+  const formDataJSON = localStorage.getItem('feedback-form-state');
+  // jeśli ta zmienna nie jest pustym stringiem
+  if (formDataJSON) {
+    // to od razu prasuje obiekt pobrany ze storage
+    const formData = JSON.parse(formDataJSON);
+    // i przypisuje polom fomularza wartości z local storage
+    emailInput.value = formData.email;
+    messageTextArea.value = formData.message;
+  }
+};
+// tej funkcji nie używamy przy żadnym nasłuchiwaniu eventu, więc musimy ją po prostu wywołać
+loadFromLocalStorage();
+
+// gdy naciśniemy przycisk
 form.addEventListener('submit', evt => {
+  // strona nie odświeży się
   evt.preventDefault();
+  // sprawdzi czy wartości pól to są same spacje
   if (emailInput.value.trim() === '' || messageTextArea.value.trim() === '') {
+    // w tym przypadku wyświetlu się alert
     return alert('Proszę wypełnić wszystkie pola formularza.');
   }
-  localStorage.removeItem('feedback-form-state');
-  form.reset();
+  // w przeciwnym przypadku jeśli to nie są same spacje i pola są rzeczywiście zapełnione, wtedy w konsoli pojawi się obiekt
   console.log('Submitted:', {
     email: emailInput.value,
     message: messageTextArea.value,
   });
+  // po wyrzuceniu danych do konsoli resetujemy cały formularz, czyli usuwamy dane z pól formularza
+  form.reset();
+  // oraz usuwamy klucz z local storage
+  localStorage.removeItem('feedback-form-state');
 });
